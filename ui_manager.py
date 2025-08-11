@@ -46,8 +46,11 @@ class UIManager:
         img, (x, _) = self.draw_text(text, font_size, color, SCREEN_WIDTH // 2, y, center=True)
         return img, (x, y)
     
-    def draw_menu(self, screen):
-        """Draw the main menu screen"""
+    def draw_menu(self, screen, last_history=None):
+        """Draw the main menu screen
+        Args:
+            last_history (list[dict] | None): recent history entries
+        """
         # Title
         title_img, title_pos = self.draw_centered_text("SPACE INVADERS", 'large', WHITE, 200)
         screen.blit(title_img, title_pos)
@@ -74,6 +77,20 @@ class UIManager:
             placeholder_img, placeholder_pos = self.draw_text("Enter name...", 'medium', (128, 128, 128),
                                                            self.input_rect.x + 5, self.input_rect.y + 5)
             screen.blit(placeholder_img, placeholder_pos)
+
+        # Recent history
+        if last_history:
+            header_img, header_pos = self.draw_centered_text("Last 3 games:", 'medium', YELLOW, 600)
+            screen.blit(header_img, header_pos)
+            for idx, h in enumerate(last_history[-3:][::-1]):
+                name = h.get('name', 'Unknown')
+                score = h.get('score', 0)
+                result = h.get('result', 'n/a')
+                duration_ms = h.get('duration_ms', 0)
+                duration_s = max(0, int(duration_ms // 1000))
+                line = f"{name} - {result} - score {score} - {duration_s}s"
+                img, pos = self.draw_centered_text(line, 'small', WHITE, 640 + idx * 24)
+                screen.blit(img, pos)
     
     def draw_game_over_screen(self, screen, score, player_name):
         """Draw the game over screen with final score"""

@@ -111,7 +111,8 @@ class SpaceInvadersGame:
         self.game_manager.draw_background(self.screen)
         
         # Draw menu UI
-        self.ui_manager.draw_menu(self.screen)
+        last_history = self.game_manager.get_last_history()
+        self.ui_manager.draw_menu(self.screen, last_history=last_history)
     
     def _update_game(self):
         """Update and render game screen"""

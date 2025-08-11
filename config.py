@@ -73,3 +73,8 @@ IMAGES = {
     'bullet': f"{ASSETS_PATH}bullet.png",
     'alien_bullet': f"{ASSETS_PATH}alien_bullet.png"
 } 
+
+# History / Persistence
+# File used to store recent game history (last N sessions)
+HISTORY_FILE = "history.json"
+MAX_HISTORY = 3

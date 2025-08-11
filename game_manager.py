@@ -5,6 +5,8 @@ Handles game state management, scoring, and overall game logic.
 
 import pygame
 import random
+import json
+import os
 from config import *
 from sprites import Spaceship, Aliens, Bullets, Alien_Bullets, Explosion
 
@@ -42,6 +44,51 @@ class GameManager:
         # Sound effects
         self.sounds = {}
         self._load_sounds()
+        
+        # History tracking
+        self._game_started_at_ms = None
+        self._last_result_recorded = False
+        self._history_path = os.path.join(os.path.dirname(__file__), HISTORY_FILE)
+        
+        # Ensure history file exists
+        self._ensure_history_file()
+
+    def _ensure_history_file(self):
+        """Create the history file if it doesn't exist."""
+        try:
+            if not os.path.exists(self._history_path):
+                with open(self._history_path, 'w', encoding='utf-8') as f:
+                    json.dump([], f)
+        except Exception:
+            # Non-fatal
+            pass
+
+    def _read_history(self):
+        """Read history list from file."""
+        try:
+            with open(self._history_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                if isinstance(data, list):
+                    return data
+        except Exception:
+            return []
+        return []
+
+    def _write_history(self, history_list):
+        """Write history list back to file, keeping only MAX_HISTORY entries."""
+        try:
+            trimmed = history_list[-MAX_HISTORY:]
+            with open(self._history_path, 'w', encoding='utf-8') as f:
+                json.dump(trimmed, f, ensure_ascii=False, indent=2)
+        except Exception:
+            # Non-fatal
+            pass
+
+    def get_last_history(self):
+        """Return last up to MAX_HISTORY entries.
+        Each entry is a dict with keys: name, score, result, duration_ms.
+        """
+        return self._read_history()[-MAX_HISTORY:]
         
     def _load_sounds(self):
         """Load all sound effects"""
@@ -111,6 +158,10 @@ class GameManager:
         self.create_spaceship()
         
         self.game_state = GAME_STATE_PLAYING
+        
+        # Start session tracking
+        self._game_started_at_ms = pygame.time.get_ticks()
+        self._last_result_recorded = False
     
     def update_countdown(self):
         """Update the countdown timer"""
@@ -150,6 +201,7 @@ class GameManager:
             if len(self.alien_group) == 0:
                 self.game_over = 1
                 self.game_state = GAME_STATE_VICTORY
+                self._record_result_if_needed(result_label='victory')
             
             # Update game if still playing
             if self.game_over == 0:
@@ -158,6 +210,7 @@ class GameManager:
                 
                 if self.game_over == -1:
                     self.game_state = GAME_STATE_GAME_OVER
+                    self._record_result_if_needed(result_label='defeat')
                 
                 # Update all sprite groups
                 self._update_sprite_groups()
@@ -172,6 +225,27 @@ class GameManager:
         self.explosion_group.update()
         
         return self.game_over
+
+    def _record_result_if_needed(self, result_label):
+        """Record a game result once per session."""
+        if self._last_result_recorded:
+            return
+        self._last_result_recorded = True
+        try:
+            started = self._game_started_at_ms or pygame.time.get_ticks()
+            duration_ms = max(0, pygame.time.get_ticks() - started)
+            entry = {
+                'name': self.player_name,
+                'score': int(self.score),
+                'result': result_label,
+                'duration_ms': int(duration_ms)
+            }
+            history = self._read_history()
+            history.append(entry)
+            self._write_history(history)
+        except Exception:
+            # Non-fatal
+            pass
     
     def _update_sprite_groups(self):
         """Update all sprite groups"""
