@@ -32,7 +32,7 @@ class SpaceInvadersGame:
         
         # Create game components
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-        pygame.display.set_caption('Space Invaders - Optimized')
+        pygame.display.set_caption('Space Invaders')
         
         # Initialize game managers
         self.ui_manager = UIManager()
