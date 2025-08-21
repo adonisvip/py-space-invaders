@@ -3,6 +3,7 @@ title = Space Invaders
 package.name = spaceinvaders
 package.domain = org.spaceinvaders
 source.dir = .
+source.main = main-adroid.py
 source.include_exts = py,png,jpg,kv,atlas
 version = 1.0
 
