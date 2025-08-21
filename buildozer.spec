@@ -7,7 +7,7 @@ source.main = main-adroid.py
 source.include_exts = py,png,jpg,kv,atlas
 version = 1.0
 
-requirements = python3,kivy,pillow
+requirements = python3,kivy,pillow,cython
 
 orientation = portrait
 fullscreen = 0
@@ -22,6 +22,10 @@ android.ndk = 19b
 
 android.private_storage = True
 android.accept_sdk_license = True
+
+# Cython configuration
+p4a.bootstrap = sdl2
+p4a.branch = master
 
 [buildozer]
 log_level = 2

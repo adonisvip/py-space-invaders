@@ -1,4 +1,5 @@
 kivy==2.2.1
 pillow==9.5.0
-buildozer==1.5.0 
+buildozer==1.5.0
+cython==0.29.33
 pygame>=2.0.0
