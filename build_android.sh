@@ -20,13 +20,23 @@ if ! command -v pip3 &> /dev/null; then
     exit 1
 fi
 
-# Kiểm tra buildozer
+# Cài đặt Cython (quan trọng!)
+echo "📦 Cài đặt Cython..."
+pip3 install cython==0.29.33
+
+# Kiểm tra Cython
+if ! python3 -c "import cython" &> /dev/null; then
+    echo "❌ Cython không thể cài đặt!"
+    exit 1
+fi
+
+# Cài đặt buildozer
 if ! command -v buildozer &> /dev/null; then
     echo "📦 Cài đặt buildozer..."
     pip3 install buildozer
 fi
 
-# Kiểm tra Kivy
+# Cài đặt Kivy
 if ! python3 -c "import kivy" &> /dev/null; then
     echo "📦 Cài đặt Kivy..."
     pip3 install kivy
@@ -48,8 +58,12 @@ fi
 # Copy file cấu hình
 echo "📋 Copy file cấu hình..."
 cp ../buildozer.spec .
-cp ../main.py .
+cp ../main-adroid.py .
 cp ../requirements.txt .
+
+# Clean build trước
+echo "🧹 Clean build trước..."
+buildozer android clean
 
 # Build APK
 echo "🔨 Bắt đầu build APK..."
