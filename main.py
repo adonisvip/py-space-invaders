@@ -20,6 +20,9 @@ from config import *
 from ui_manager import UIManager
 from game_manager import GameManager
 
+# Import constants for screen dimensions
+from config import SCREEN_WIDTH, SCREEN_HEIGHT, WHITE, FPS
+
 class SpaceInvadersGame:
     """
     Main game class that orchestrates all game components
@@ -68,6 +71,11 @@ class SpaceInvadersGame:
             elif self.game_manager.game_state == GAME_STATE_VICTORY:
                 self._update_victory()
             
+            # Handle quit during countdown
+            if (self.game_manager.game_state == GAME_STATE_PLAYING and 
+                self.game_manager.countdown > 0):
+                self._handle_countdown_events()
+            
             # Update display
             pygame.display.update()
             
@@ -85,6 +93,8 @@ class SpaceInvadersGame:
             # Handle events based on game state
             if self.game_manager.game_state == GAME_STATE_MENU:
                 self._handle_menu_events(event)
+            elif self.game_manager.game_state == GAME_STATE_PLAYING:
+                self._handle_game_events(event)
             elif self.game_manager.game_state in [GAME_STATE_GAME_OVER, GAME_STATE_VICTORY]:
                 self._handle_end_game_events(event)
     
@@ -95,6 +105,21 @@ class SpaceInvadersGame:
             # Player pressed Enter, start game if name is provided
             if self.ui_manager.player_name.strip():
                 self.game_manager.start_new_game(self.ui_manager.player_name)
+        
+        # Handle quit from menu
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE or event.key == pygame.K_q:
+                self.running = False
+    
+    def _handle_game_events(self, event):
+        """Handle events during gameplay"""
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                # Show pause menu or quit confirmation
+                self._show_pause_menu()
+            elif event.key == pygame.K_q:
+                # Quick quit during gameplay
+                self._confirm_quit()
     
     def _handle_end_game_events(self, event):
         """Handle events during game over/victory state"""
@@ -102,8 +127,95 @@ class SpaceInvadersGame:
             if event.key == pygame.K_r:  # Restart
                 self.game_manager.reset_game()
                 self.ui_manager.player_name = ""
-            elif event.key == pygame.K_q:  # Quit
+            elif event.key == pygame.K_q or event.key == pygame.K_ESCAPE:  # Quit
                 self.running = False
+    
+    def _handle_countdown_events(self):
+        """Handle events during countdown (allow quitting)"""
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
+                return
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE or event.key == pygame.K_q:
+                    self._confirm_quit()
+                    return
+    
+    def _show_pause_menu(self):
+        """Show pause menu with options to resume or quit"""
+        paused = True
+        while paused:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.running = False
+                    return
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:  # Resume
+                        paused = False
+                    elif event.key == pygame.K_q:  # Quit
+                        self._confirm_quit()
+                        return
+            
+            # Draw pause menu
+            self._draw_pause_menu()
+            pygame.display.update()
+            self.clock.tick(FPS)
+    
+    def _draw_pause_menu(self):
+        """Draw the pause menu overlay"""
+        # Semi-transparent overlay
+        overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+        overlay.set_alpha(128)
+        overlay.fill((0, 0, 0))
+        self.screen.blit(overlay, (0, 0))
+        
+        # Pause menu text
+        pause_img, pause_pos = self.ui_manager.draw_centered_text("PAUSED", 'large', WHITE, SCREEN_HEIGHT // 2 - 100)
+        self.screen.blit(pause_img, pause_pos)
+        
+        resume_img, resume_pos = self.ui_manager.draw_centered_text("Press ESC to resume", 'medium', WHITE, SCREEN_HEIGHT // 2)
+        self.screen.blit(resume_img, resume_pos)
+        
+        quit_img, quit_pos = self.ui_manager.draw_centered_text("Press Q to quit", 'medium', WHITE, SCREEN_HEIGHT // 2 + 50)
+        self.screen.blit(quit_img, quit_pos)
+    
+    def _confirm_quit(self):
+        """Show quit confirmation dialog"""
+        confirmed = False
+        while not confirmed:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.running = False
+                    return
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_y:  # Yes, quit
+                        self.running = False
+                        return
+                    elif event.key == pygame.K_n or event.key == pygame.K_ESCAPE:  # No, cancel
+                        confirmed = True
+            
+            # Draw quit confirmation
+            self._draw_quit_confirmation()
+            pygame.display.update()
+            self.clock.tick(FPS)
+    
+    def _draw_quit_confirmation(self):
+        """Draw quit confirmation dialog"""
+        # Semi-transparent overlay
+        overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+        overlay.set_alpha(128)
+        overlay.fill((0, 0, 0))
+        self.screen.blit(overlay, (0, 0))
+        
+        # Confirmation text
+        confirm_img, confirm_pos = self.ui_manager.draw_centered_text("Quit game?", 'large', WHITE, SCREEN_HEIGHT // 2 - 100)
+        self.screen.blit(confirm_img, confirm_pos)
+        
+        yes_img, yes_pos = self.ui_manager.draw_centered_text("Press Y to quit", 'medium', WHITE, SCREEN_HEIGHT // 2)
+        self.screen.blit(yes_img, yes_pos)
+        
+        no_img, no_pos = self.ui_manager.draw_centered_text("Press N or ESC to cancel", 'medium', WHITE, SCREEN_HEIGHT // 2 + 50)
+        self.screen.blit(no_img, no_pos)
     
     def _update_menu(self):
         """Update and render menu screen"""

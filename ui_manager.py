@@ -78,9 +78,13 @@ class UIManager:
                                                            self.input_rect.x + 5, self.input_rect.y + 5)
             screen.blit(placeholder_img, placeholder_pos)
 
+        # Quit instruction - moved below input field to avoid overlap
+        quit_img, quit_pos = self.draw_centered_text("Press ESC or Q to quit", 'medium', WHITE, 500)
+        screen.blit(quit_img, quit_pos)
+
         # Recent history
         if last_history:
-            header_img, header_pos = self.draw_centered_text("Last 3 games:", 'medium', YELLOW, 600)
+            header_img, header_pos = self.draw_centered_text("Last 3 games:", 'medium', YELLOW, 620)
             screen.blit(header_img, header_pos)
             for idx, h in enumerate(last_history[-3:][::-1]):
                 name = h.get('name', 'Unknown')
@@ -89,7 +93,7 @@ class UIManager:
                 duration_ms = h.get('duration_ms', 0)
                 duration_s = max(0, int(duration_ms // 1000))
                 line = f"{name} - {result} - score {score} - {duration_s}s"
-                img, pos = self.draw_centered_text(line, 'small', WHITE, 640 + idx * 24)
+                img, pos = self.draw_centered_text(line, 'small', WHITE, 660 + idx * 24)
                 screen.blit(img, pos)
     
     def draw_game_over_screen(self, screen, score, player_name):
@@ -113,6 +117,10 @@ class UIManager:
         
         quit_img, quit_pos = self.draw_centered_text("Press Q to quit", 'medium', WHITE, 490)
         screen.blit(quit_img, quit_pos)
+        
+        # Additional quit option
+        esc_quit_img, esc_quit_pos = self.draw_centered_text("Press ESC to quit", 'medium', WHITE, 530)
+        screen.blit(esc_quit_img, esc_quit_pos)
     
     def draw_victory_screen(self, screen, score, player_name):
         """Draw the victory screen with final score"""
@@ -135,6 +143,10 @@ class UIManager:
         
         quit_img, quit_pos = self.draw_centered_text("Press Q to quit", 'medium', WHITE, 490)
         screen.blit(quit_img, quit_pos)
+        
+        # Additional quit option
+        esc_quit_img, esc_quit_pos = self.draw_centered_text("Press ESC to quit", 'medium', WHITE, 530)
+        screen.blit(esc_quit_img, esc_quit_pos)
     
     def draw_hud(self, screen, score, player_name, health):
         """Draw the heads-up display during gameplay"""
@@ -152,6 +164,11 @@ class UIManager:
         health_text = f"Health: {health}"
         health_img, health_pos = self.draw_text(health_text, 'medium', WHITE, 10, 70)
         screen.blit(health_img, health_pos)
+        
+        # Quit instruction
+        quit_text = "ESC: Pause | Q: Quit"
+        quit_img, quit_pos = self.draw_text(quit_text, 'small', WHITE, 10, 100)
+        screen.blit(quit_img, quit_pos)
     
     def draw_countdown(self, screen, countdown):
         """Draw the countdown screen before game starts"""
@@ -161,6 +178,10 @@ class UIManager:
             
             count_img, count_pos = self.draw_centered_text(str(countdown), 'large', WHITE, SCREEN_HEIGHT // 2 + 100)
             screen.blit(count_img, count_pos)
+            
+            # Quit instruction during countdown
+            quit_img, quit_pos = self.draw_centered_text("Press ESC or Q to quit", 'small', WHITE, SCREEN_HEIGHT // 2 + 150)
+            screen.blit(quit_img, quit_pos)
     
     def handle_input_events(self, event):
         """Handle input events for player name entry"""
