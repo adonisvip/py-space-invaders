@@ -56,8 +56,7 @@ A modern Python implementation of the classic Space Invaders arcade game built w
 
 ```
 py-space-invaders/
-├── main.py              # Main game entry point (optimized version)
-├── main-base.py         # Original monolithic version
+├── main.py              # Main game entry point
 ├── config.py            # Game configuration and constants
 ├── game_manager.py      # Game state and logic management
 ├── sprites.py           # All sprite classes (player, aliens, bullets, explosions)
