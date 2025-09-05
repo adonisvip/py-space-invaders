@@ -142,8 +142,7 @@ Game settings can be modified in `config.py`:
 
 1. **Sound not playing**: Check if audio files exist in `img/` directory
 2. **Images not loading**: Verify all image files are present in `img/` directory
-3. **Buildozer build fails**: Ensure Android SDK and NDK are properly installed
-4. **Game crashes on start**: Check Python and Pygame versions
+3. **Game crashes on start**: Check Python and Pygame versions
 
 ### Dependencies
 
