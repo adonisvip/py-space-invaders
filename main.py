@@ -1,15 +1,3 @@
-"""
-Space Invaders - Optimized Version
-Main game file with modular structure, player name input, and score tracking.
-
-This optimized version includes:
-- Modular code structure with separate files for different components
-- Player name input system
-- Score tracking and display
-- Improved game state management
-- Better code organization and documentation
-"""
-
 import pygame
 from pygame import mixer
 from pygame.locals import *
